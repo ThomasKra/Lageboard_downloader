@@ -1,0 +1,78 @@
+{
+  "roles": [
+    "OrgL",
+    "Gruppenführer",
+    "Patientenverwaltung",
+    "Leitstellenfunk",
+    "Einsatzstellenfunk"
+  ],
+  "profiles": [
+    {
+      "name": "Standard",
+      "missionJournal": "none",
+      "missionMap": "none",
+      "patients": "none",
+      "sectionReports": "none",
+      "roles": []
+    },
+    {
+      "name": "IuK Helfer",
+      "missionJournal": "readwrite",
+      "missionMap": "readwrite",
+      "patients": "readwrite",
+      "sectionReports": "readwrite",
+      "roles": [
+        "Leitstellenfunk",
+        "Einsatzstellenfunk"
+      ]
+    },
+    {
+      "name": "Gruppenführer",
+      "missionJournal": "readwrite",
+      "missionMap": "readwrite",
+      "patients": "readwrite",
+      "sectionReports": "readwrite",
+      "roles": [
+        "Gruppenführer"
+      ],
+      "is_admin": true
+    },
+    {
+      "name": "OrgL",
+      "missionJournal": "readonly",
+      "missionMap": "readonly",
+      "patients": "readonly",
+      "sectionReports": "readonly",
+      "roles": [
+        "OrgL"
+      ]
+    },
+    {
+      "name": "Patientenverwaltung",
+      "missionJournal": "none",
+      "missionMap": "none",
+      "patients": "readwrite",
+      "sectionReports": "none",
+      "roles": [
+        "Patientenverwaltung"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "nachname": "Patienten",
+      "vorname": "Verwaltung",
+      "profiles": [
+        "Patientenverwaltung"
+      ],
+      "einsatzabschnitt": "NORD"
+    },
+    {
+      "nachname": "Org",
+      "vorname": "Leiter",
+      "profiles": [
+        "OrgL"
+      ]
+    }
+  ]
+}
