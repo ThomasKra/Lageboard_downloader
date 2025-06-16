@@ -12,8 +12,8 @@ Stellen Sie sicher, dass die folgenden Voraussetzungen erfüllt sind, bevor Sie 
 
 1. Klonen Sie dieses Repository:
   ```bash
-  git clone https://github.com/username/einsatzleitsoftware_downloader_installer.git
-  cd einsatzleitsoftware_downloader_installer
+  git clone https://github.com/ThomasKra/Lageboard_downloader.git
+  cd Lageboard_downloader
   ```
 
 2. Erstellen Sie eine virtuelle Umgebung und aktivieren Sie diese:
@@ -27,7 +27,7 @@ Stellen Sie sicher, dass die folgenden Voraussetzungen erfüllt sind, bevor Sie 
   pip install -r requirements.txt
   ```
 4. Erstellen der notwendigen Dateien
-  Erstelle eine .env Datei (z.B. durch Kopieren der .env_example) und trage den BITBUCKET_BEARER_TOKEN ein
+  Erstelle eine .env Datei (z.B. durch Kopieren der .env_example) und trage den GITHUB_PERSONAL_ACCESS_TOKEN ein
 
   Im Unterordner configs/ muss die .env für die Laravel-Installation hinterlegt sein, sowie die user_seed.json die für die Initialisierung verwendet werden soll. Die Dateien müssen an die Installation angepasst werden.
 

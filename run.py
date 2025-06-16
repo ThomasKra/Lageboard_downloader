@@ -15,17 +15,19 @@ from dotenv import dotenv_values, load_dotenv
 
 load_dotenv('.env')
 
-repository = 'einsatzdokumentation-base'
-workspace = 'ThomasKra'
-bearerToken = os.getenv('BITBUCKET_BEARER_TOKEN')
-if bearerToken is None:
-  print('BITBUCKET_BEARER_TOKEN muss im .env angegeben werden!')
+repository = 'Lageboard'
+githubUser = 'ThomasKra'
+githubPersonalAccessToken = os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')
+if githubPersonalAccessToken is None:
+  print('GITHUB_PERSONAL_ACCESS_TOKEN muss im .env angegeben werden!')
   exit(2)
 headersList = {
     "Accept": "*/*",
-    "Authorization": f"Bearer {bearerToken}"
+    "Authorization": f"Bearer {githubPersonalAccessToken}",
+    "X-GitHub-Api-Version": "2022-11-28"
+
 }
-targetFolder = os.getenv('TARGET_FOLDER', 'einsatzverwaltung')
+targetFolder = os.getenv('TARGET_FOLDER', 'LageBoard')
 tempFolder = 'temp'
 configsFolder = 'configs'
 
@@ -86,30 +88,14 @@ def extract_tar_gz(archive_path: str, destination_directory: str):
 
 
 def getDownloadsList():
-    reqUrl = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{repository}/downloads/"
+    reqUrl = f"https://api.github.com/repos/{githubUser}/{repository}/releases"
 
     return requests.request("GET", reqUrl, headers=headersList)
 
-
-def is_downloadable(url):
-    """
-    Does the url contain a downloadable resource
-    """
-    h = requests.head(url, allow_redirects=True)
-    header = h.headers
-    content_type = header.get('content-type')
-    if 'text' in content_type.lower():
-        return False
-    if 'html' in content_type.lower():
-        return False
-    return True
-
-
-def downloadArtifact(filename: str):
-    reqUrl = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{repository}/downloads/{filename}"
-    if is_downloadable(reqUrl):
-        open(filename, 'wb').write(requests.request(
-            "GET", reqUrl, headers=headersList).content)
+def downloadArtifact(filename: str, reqUrl: str):
+    open(filename, 'wb').write(requests.request(
+            "GET", reqUrl, headers=headersList |{"Accept": "application/octet-stream",
+}).content)
         
 def delete_tar_gz_files_in_basepath():
     """
@@ -132,48 +118,26 @@ try:
     downloadsList = getDownloadsList().json()
 except:
     print('Exception occurred')
+    exit(code=-1)
 
 # Latest:
-filename = downloadsList.get('values')[0].get('name')
-created_on = downloadsList.get('values')[0].get('created_on')
-link = downloadsList.get('values')[0].get('links').get('self').get('href')
+latest = downloadsList[0].get('assets')[0]
+filename = latest.get('name')
+created_on = latest.get('created_at')
+link = latest.get('url')
 
 print(f'File: {filename} Created on: {created_on}: {link}')
-download = True
-if os.path.isfile(os.path.join(basePath, filename)):
-    # Datei existiert bereits, den Benutzer fragen, ob sie überschrieben werden soll
-    antwort = input(
-        f"Die Datei '{filename}' existiert bereits. Möchten Sie sie überschreiben? (ja/nein): ").strip().lower()
-    download = (antwort == 'ja')
 
-if download:
-    delete_tar_gz_files_in_basepath()
-    print('Downloading it now')
-    downloadArtifact(filename)
-    print('Downloading finished')
+delete_tar_gz_files_in_basepath()
+print('Downloading it now')
+downloadArtifact(filename, link)
+print('Downloading finished')
 
 print("Deleting old installation")
 shutil.rmtree(targetFolder,True)
 
 extract_tar_gz(filename, targetFolder)
-'''
-if os.path.isdir(os.path.join(basePath, targetFolder)):
-    # erst mal alles löschen
-    # Copy each item in the source folder to the destination folder
-    for item in os.listdir(tempFolder):
-        source_item = os.path.join(tempFolder, item)
-        destination_item = os.path.join(targetFolder, item)
 
-        if os.path.isdir(source_item):
-            # If the item is a directory, recursively copy its contents
-            shutil.rmtree(destination_item,True)
-            shutil.copytree(source_item, destination_item)
-        else:
-            # If the item is a file, copy it directly
-            shutil.copy2(source_item, destination_item)
-else:
-    shutil.copytree(tempFolder, targetFolder)
-'''
 if not os.path.isdir(os.path.abspath(configsFolder)):
     print('\"configs\"-Verzeichnis muss existieren!')
     exit(2)
