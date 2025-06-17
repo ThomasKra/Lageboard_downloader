@@ -37,6 +37,12 @@ Stellen Sie sicher, dass die folgenden Voraussetzungen erfüllt sind, bevor Sie 
   ```
   Es wird automatisch die aktuellste Version heruntergeladen, installiert und ggf. eine frische Migration durchgeführt.
 
+6. Bereite die Instanz vor:
+  Wenn du die Instanz zum ersten Mal nutzt musst du einen Schlüssel für die Verschlüsselung erzeugen:
+  ```
+  php artisan key:generate
+  ```
+
 
 ## Fehlerbehebung
 

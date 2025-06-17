@@ -94,7 +94,7 @@ def getDownloadsList():
 
 def downloadArtifact(filename: str, reqUrl: str):
     open(filename, 'wb').write(requests.request(
-            "GET", reqUrl, headers=headersList |{"Accept": "application/octet-stream",
+            "GET", reqUrl, headers={**headersList ,"Accept": "application/octet-stream",
 }).content)
         
 def delete_tar_gz_files_in_basepath():
