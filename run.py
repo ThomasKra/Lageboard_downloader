@@ -10,7 +10,7 @@ import shutil
 import subprocess
 import glob
 from pathlib import Path
-
+import questionary
 from dotenv import dotenv_values, load_dotenv
 
 load_dotenv('.env')
@@ -81,9 +81,9 @@ def extract_tar_gz(archive_path: str, destination_directory: str):
         with tarfile.open(archive_path, "r:gz") as tar:
             tar.extractall(path=destination_directory)
         print(
-            f"The archive '{archive_path}' was successfully extracted to '{destination_directory}'.")
+            f"Das Archiv '{archive_path}' wurde erfolgreich nach '{destination_directory}' entpackt.")
     except Exception as e:
-        print(f"An error occurred while extracting the archive: {e}")
+        print(f"Während des Entpackens ist ein Fehler aufgetreten: {e}")
 
 
 
@@ -117,27 +117,40 @@ def delete_tar_gz_files_in_basepath():
 try:
     downloadsList = getDownloadsList().json()
 except:
-    print('Exception occurred')
+    print('Beim Abruf der verfügbaren Versionen ist ein Fehler aufgetreten')
     exit(code=-1)
 
-# Latest:
-latest = downloadsList[0].get('assets')[0]
-filename = latest.get('name')
-created_on = latest.get('created_at')
-link = latest.get('url')
+# Extrahiere alle Versionen (z.B. Tag-Name oder Name)
+versionen = []
+for release in downloadsList:
+    tag = release.get('tag_name') or release.get('name')
+    versionen.append(tag)
 
-print(f'File: {filename} Created on: {created_on}: {link}')
+# Benutzer wählt eine Version aus
+auswahl = questionary.select(
+    "Welche Version möchtest du installieren?",
+    choices=versionen
+).ask()
+
+# Finde das Release-Objekt zur gewählten Version
+gewaehltes_release = next(r for r in downloadsList if (r.get('tag_name') or r.get('name')) == auswahl).get('assets')[0]
+
+filename = gewaehltes_release.get('name')
+created_on = gewaehltes_release.get('created_at')
+link = gewaehltes_release.get('url')
 
 delete_tar_gz_files_in_basepath()
-print('Downloading it now')
+print('Download gestartet', end='\r', flush=True)
 downloadArtifact(filename, link)
-print('Downloading finished')
+print('Download beendet' + ' '*10)
+print()
 
-print("Deleting old installation")
+print("Lösche die alte Installation", end='\r', flush=True)
+
 shutil.rmtree(targetFolder,True)
 
 extract_tar_gz(filename, targetFolder)
-
+print()
 if not os.path.isdir(os.path.abspath(configsFolder)):
     print('\"configs\"-Verzeichnis muss existieren!')
     exit(2)
@@ -155,6 +168,7 @@ if not os.path.isfile(os.path.join(configsFolder, 'user_seed.json')):
  for item in ['.env', 'user_seed.json']]
 
 print('Kopieren der Konfigurationsdaten erfolgreich')
+print()
 
 app_url= dotenv_values(os.path.join(configsFolder, '.env')).get('APP_URL')
 
@@ -169,7 +183,7 @@ if len(matches) != 1:
 
 print(
     f'App URL Protocol: {app_url_protocol}, App URL domain: {app_url_domain}')
-
+print()
 
 # Routes anpassen
 
@@ -210,10 +224,10 @@ replace_localhost_url_in_build_assets()
 # Aritsan-Commands für die Installations / Update
 
 php_bin= os.getenv('PHP_BIN', 'php')
-
-antwort = input(
+migrateFresh = questionary.confirm('Soll eine frische Migration durchlaufen werden?', auto_enter=False).ask()
+""" antwort = input(
         f"Soll eine frische Migration durchlaufen werden? (ja/nein): ").strip().lower()
-migrateFresh = (antwort == 'ja')
+migrateFresh = (antwort == 'ja') """
 
 artisan_commands = ['optimize']
 
