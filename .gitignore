@@ -2,6 +2,9 @@
 .vscode/
 temp/
 einsatz*/
+LageBoard/
 
 *.tar.gz
 /.env
+configs/.env
+configs/user_seed.json

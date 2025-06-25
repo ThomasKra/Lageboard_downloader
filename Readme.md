@@ -29,7 +29,7 @@ Stellen Sie sicher, dass die folgenden Voraussetzungen erfüllt sind, bevor Sie 
 4. Erstellen der notwendigen Dateien
   Erstelle eine .env Datei (z.B. durch Kopieren der .env_example) und trage den GITHUB_PERSONAL_ACCESS_TOKEN ein
 
-  Im Unterordner configs/ muss die .env für die Laravel-Installation hinterlegt sein, sowie die user_seed.json die für die Initialisierung verwendet werden soll. Die Dateien müssen an die Installation angepasst werden.
+  Im Unterordner configs/ muss die .env für die Laravel-Installation hinterlegt sein, sowie die user_seed.json die für die Initialisierung verwendet werden soll. Beispieldateien sind im Repository vorhanden. Die Dateien müssen an die Installation angepasst werden.
 
 5. Führen Sie das Skript aus:
   ```bash
